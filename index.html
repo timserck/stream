@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+	<head> 
+		<meta charset="utf-8" />
+		<title>webcam</title>
+		<style>
+	html,body,header {
+margin: 0;
+  padding: 0;
+  	height: 100%;
+	width: 100%;
+	position: relative;
+	font-family: sans-serif;
+}
+
+
+video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+@media (min-aspect-ratio: 16/9) {
+  video {
+    height: 300%;
+    top: -100%;
+    /* Ou bien height: 200%; top: -50%; */
+    /* Ou bien height: 400%; top: -150%; */
+  }
+}
+@media (max-aspect-ratio: 16/9) {
+  video {
+    width: 300%;
+    left: -100%;
+    /* Ou bien width: 200%; left: -50%; */
+    /* Ou bien width: 400%; left: -150%; */
+  }
+}
+
+@supports (object-fit: cover) {
+ video {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    object-fit: cover;
+  }
+}
+
+
+
+
+
+
+.grayscale {
+  -webkit-filter: grayscale(1);
+  -moz-filter: grayscale(1);
+  -ms-filter: grayscale(1);
+  -o-filter: grayscale(1);
+  filter: grayscale(1);
+}
+.sepia {
+	-webkit-filter:sepia(1);
+  -moz-filter:sepia(1);
+  -ms-filter: sepia(1);
+  -o-filter: sepia(1);
+  filter: sepia(1);
+  
+}
+.blur {
+	-webkit-filter: blur(3px);
+  -moz-filter: blur(3px);
+  -ms-filter:  blur(3px);
+  -o-filter:  blur(3px);
+filter: blur(3px);
+}
+
+
+
+
+
+		</style>
+	</head>
+	
+	<body>
+	<header>
+	
+		<video id="camera-stream"  autoplay></video>
+	
+	
+	</header>
+	
+
+	
+ 	<script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+
+
+<script>
+ 
+/*
+Implementation of Matt West's excellent "Accessing the Device Camera with getUserMedia" article found at http://blog.teamtreehouse.com/accessing-the-device-camera-with-getusermedia
+*/
+
+window.onload = function() {
+
+var hdConstraints = {
+  video: {
+    mandatory: {
+      minWidth: 1280,
+      minHeight: 720
+    }
+  }
+};
+
+var vgaConstraints = {
+  video: {
+    mandatory: {
+      maxWidth: 640,
+      maxHeight: 360
+    }
+  }
+};
+  // Normalize the various vendor prefixed versions of getUserMedia.
+  navigator.getUserMedia = (navigator.getUserMedia ||
+                            navigator.webkitGetUserMedia ||
+                            navigator.mozGetUserMedia || 
+                            navigator.msGetUserMedia);
+
+
+  
+  // Check that the browser supports getUserMedia.
+  // If it doesn't show an alert, otherwise continue.
+  if (navigator.getUserMedia) {
+    // Request the camera.
+    navigator.getUserMedia(
+      // Constraints
+      {
+
+        video: true, audio: false, vgaConstraints, hdConstraints
+
+
+      },
+  
+      // Success Callback
+      function(localMediaStream) {
+        // Get a reference to the video element on the page.
+        var vid = document.getElementById('camera-stream');
+        
+        // Create an object URL for the video stream and use this 
+        // to set the video source.
+        vid.src = window.URL.createObjectURL(localMediaStream);
+      },
+  
+      // Error Callback
+      function(err) {
+        // Log the error to the console.
+        console.log('The following error occurred when trying to use getUserMedia: ' + err);
+      }
+    );
+  
+  } else {
+    alert('Sorry, your browser does not support getUserMedia');
+  }
+
+var idx = 0;
+var filters = ['grayscale', 'sepia', 'blur', ''];
+
+function changeFilter(e) {
+  var el = e.target;
+  el.className = '';
+  var effect = filters[idx++ % filters.length]; // loop through filters.
+  if (effect) {
+    el.classList.add(effect);
+  }
+}
+
+document.querySelector('video').addEventListener(
+    'click', changeFilter, false);
+
+
+}
+
+ 
+
+</script>
+		
+	</body>
+</html>
